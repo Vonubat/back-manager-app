@@ -30,6 +30,8 @@ export const findColumnById = async (id: string) => {
   if (!foundColumn) {
     throw new Error("NOT_EXIST");
   }
+
+  return foundColumn;
 }
 
 export const findColumns = (params: any) => {
