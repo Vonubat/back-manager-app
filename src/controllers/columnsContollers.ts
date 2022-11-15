@@ -1,6 +1,6 @@
 import { Response, Request } from 'express';
 import * as columnService from '../services/column.service';
-import { checkBody, createError } from '../services/error.service';
+import { checkBody, createError, defineErrorResponse } from '../services/error.service';
 
 
 export const getColumns = async (req: Request, res: Response) => {
@@ -19,7 +19,10 @@ export const getColumnById = async (req: Request, res: Response) => {
     res.json(foundedColumn);
   }
   catch (err) {
-    return res.status(404).send(createError(404, 'Column was not founded!'));
+    const error = err as Error;
+    const { code, message } = defineErrorResponse(error, 'COLUMN');
+
+    return res.status(code).send(createError(code, message));
   }
 
 };
@@ -56,7 +59,12 @@ export const updateColumn = async (req: Request, res: Response) => {
     const updatedColumn = await columnService.updateColumn(req.params['columnId'], { title, order }, guid, initUser)
     res.json(updatedColumn);
   }
-  catch (err) { return console.log(err); }
+  catch (err) {
+    const error = err as Error;
+    const { code, message } = defineErrorResponse(error, 'COLUMN');
+
+    return res.status(code).send(createError(code, message));
+  }
 };
 
 export const deleteColumn = async (req: Request, res: Response) => {
@@ -66,5 +74,10 @@ export const deleteColumn = async (req: Request, res: Response) => {
     const deletedColumn = await columnService.deleteColumnById(req.params['columnId'], guid, initUser);
     res.json(deletedColumn);
   }
-  catch (err) { return console.log(err); }
+  catch (err) {
+    const error = err as Error;
+    const { code, message } = defineErrorResponse(error, 'COLUMN');
+
+    return res.status(code).send(createError(code, message));
+  }
 };

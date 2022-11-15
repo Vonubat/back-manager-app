@@ -362,11 +362,15 @@
             "schema": {
               "required": [
                 "title",
+                "description",
                 "owner",
                 "users"
               ],
               "properties": {
                 "title": {
+                  "type": "string"
+                },
+                "description": {
                   "type": "string"
                 },
                 "owner": {
@@ -1861,6 +1865,7 @@
       "required": [
         "_id",
         "title",
+        "description",
         "owner",
         "users"
       ],
@@ -1869,6 +1874,9 @@
           "type": "string"
         },
         "title": {
+          "type": "string"
+        },
+        "description": {
           "type": "string"
         },
         "owner": {
@@ -1884,6 +1892,7 @@
       "example": {
         "_id": "Board id",
         "title": "Board title",
+        "description": "Board description",
         "owner": "userId of owner",
         "users": [
           "userId of invited user #1",

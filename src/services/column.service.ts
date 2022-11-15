@@ -24,8 +24,12 @@ export const findOneColumn = (params: any) => {
   return column.findOne(params);
 }
 
-export const findColumnById = (id: string) => {
-  return column.findById(new ObjectId(id));
+export const findColumnById = async (id: string) => {
+  const foundColumn = await column.findById(new ObjectId(id));
+
+  if (!foundColumn) {
+    throw new Error("NOT_EXIST");
+  }
 }
 
 export const findColumns = (params: any) => {
@@ -33,8 +37,17 @@ export const findColumns = (params: any) => {
 }
 
 export const updateColumn = async (id: string, params: any, guid: string, initUser: string, emit = true, notify = true) => {
+  if (!ObjectId.isValid(id)) {
+    throw new Error("INVALID_ID") 
+  }
+
   const columnId = new ObjectId(id);
   const updatedColumn = await column.findByIdAndUpdate(columnId, params, { new: true })
+
+  if (!updatedColumn) {
+    throw new Error("NOT_EXIST");
+  }
+
   if (emit) {
     socket.emit('columns', {
       action: 'update',
@@ -50,7 +63,13 @@ export const updateColumn = async (id: string, params: any, guid: string, initUs
 
 export const deleteColumnById = async (columnId: string, guid: string, initUser: string, emit = true, notify = true) => {
   const id = new ObjectId(columnId);
+  
   const deletedColumn = await column.findByIdAndDelete(id);
+
+  if (!deletedColumn) {
+    throw new Error("NOT_EXIST");
+  }
+
   await taskService.deleteTaskByParams({ columnId }, guid, initUser);
   if (emit) {
     socket.emit('columns', {

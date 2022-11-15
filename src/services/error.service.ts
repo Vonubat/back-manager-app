@@ -18,3 +18,17 @@ export function checkBody(body: object, keys: string[]): string | null {
   }
   return null;
 }
+
+export function defineErrorResponse(error: Error, context: string) {
+  if (error.message === 'INVALID_ID') {
+    return { code: 400, message: `${context}_ID_IS_INVALID` };
+  }
+
+  if (error.message === 'NOT_EXIST') {
+    return { code: 404, message: `${context}_DOES_NOT_EXIST`};
+  }
+
+  console.log(error);
+
+  return { code: 500, message: 'SERVER_ERROR' };
+}

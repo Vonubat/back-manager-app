@@ -6,6 +6,7 @@ import { socket } from './server.service';
 export const createBoard = async (params: any, guid: string, initUser: string, emit = true, notify = true) => {
   const newBoard = new board(params);
   await newBoard.save();
+
   if (emit) {
     socket.emit('boards', {
       action: 'add',
@@ -16,6 +17,7 @@ export const createBoard = async (params: any, guid: string, initUser: string, e
       initUser
     });
   }
+
   return newBoard;
 }
 
@@ -33,10 +35,20 @@ export const findBoardsByUser = async (userId: string) => {
 }
 
 export const updateBoard = async (id: string, params: any, guid: string, initUser: string, emit = true, notify = true) => {
+  if (!ObjectId.isValid(id)) {
+    throw new Error("INVALID_ID") 
+  }
+
   const boardId = new ObjectId(id);
   const oldVersion = await findBoardById(id);
+  
+  if (!oldVersion) {
+    throw new Error("NOT_EXIST");
+  }
+
   const deletedUsers = oldVersion.users.filter((user: string) => !params.users.includes(user));
   const updatedBoard = await board.findByIdAndUpdate(boardId, params, { new: true });
+
   if (emit) {
     socket.emit('boards', {
       action: 'update',
@@ -47,6 +59,7 @@ export const updateBoard = async (id: string, params: any, guid: string, initUse
       initUser
     });
   }
+
   if (deletedUsers.length > 0) {
     socket.emit('boards', {
       action: 'delete',
@@ -57,14 +70,26 @@ export const updateBoard = async (id: string, params: any, guid: string, initUse
       initUser
     });
   }
+
   return updatedBoard;
 }
 
 export const deleteBoardById = async (boardId: string, guid: string, initUser: string, emit = true, notify = true) => {
+  if (!ObjectId.isValid(boardId)) {
+    throw new Error("INVALID_ID") 
+  }
+
   const id = new ObjectId(boardId);
   const deletedBoard = await board.findByIdAndDelete(id);
+
+  if (!deletedBoard) {
+    throw new Error("NOT_EXIST");
+  }
+
   const users = [...deletedBoard.users, deletedBoard.owner]
+
   await columnService.deleteColumnByParams({ boardId }, guid, initUser);
+
   if (emit) {
     socket.emit('boards', {
       action: 'delete',
