@@ -1,6 +1,6 @@
 import { Response, Request } from 'express';
 import * as columnService from '../services/column.service';
-import { checkBody, createError } from '../services/error.service';
+import { checkBody, createError, defineErrorResponse } from '../services/error.service';
 import { socket } from '../services/server.service';
 import * as boardService from '../services/board.service';
 
@@ -26,7 +26,13 @@ export const updateSetOfColumns = async (req: Request, res: Response) => {
     try {
       updatedColumns.push(await columnService.updateColumn(_id, { order }, guid, initUser, false));
     }
-    catch (err) { return console.log(err); }
+    catch (err) { 
+      const error = err as Error;
+
+      const { code, message } = defineErrorResponse(error, 'COLUMN');
+
+      res.status(code).send(createError(code, message));
+    }
 
   }
   socket.emit('columns', {

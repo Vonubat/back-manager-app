@@ -25,13 +25,7 @@ export const findOneColumn = (params: any) => {
 }
 
 export const findColumnById = async (id: string) => {
-  const foundColumn = await column.findById(new ObjectId(id));
-
-  if (!foundColumn) {
-    throw new Error("NOT_EXIST");
-  }
-
-  return foundColumn;
+  return column.findById(new ObjectId(id));
 }
 
 export const findColumns = (params: any) => {
