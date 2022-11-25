@@ -52,7 +52,7 @@ export const updateBoard = async (id: string, params: any, guid: string, initUse
   if (emit) {
     socket.emit('boards', {
       action: 'update',
-      users: await getUserIdsByBoardsIds([updatedBoard._id]),
+      users: await getUserIdsByBoardsIds([updatedBoard._id.toString()]),
       ids: [updatedBoard._id],
       guid,
       notify,
